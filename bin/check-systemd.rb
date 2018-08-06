@@ -36,7 +36,7 @@ class CheckSystemd < Sensu::Plugin::Check::CLI
   option :sudo,
          short: '-S',
          long: '--sudo',
-         description: 'run systemctl command as non-root user using sudo'
+         description: 'run systemctl command as non-root user using sudo',
          boolean: true,
          default: false
 
