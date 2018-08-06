@@ -33,23 +33,37 @@ class CheckSystemd < Sensu::Plugin::Check::CLI
          short: '-s SERVICES',
          proc: proc { |a| a.split(',') }
 
+  option :sudo,
+         short: '-S',
+         long: '--sudo',
+         description: 'run systemctl command as non-root user using sudo'
+         boolean: true,
+         default: false
+
+
   # Setup variables
   #
   def initialize
     super
     @services = config[:services]
+    @sudo = config[:sudo]
     @crit_service = []
   end
 
+  def run_system_command command
+    command = 'sudo ' + command if @sudo
+    `#{command}`
+  end
+
   def all_service_names
-    systemd_output = `systemctl --no-legend`
+    systemd_output = run_system_command('systemctl --no-legend')
     systemd_output.split("\n").collect do |line|
       line.split(' ').first
     end
   end
 
   def unit_services
-    systemd_output = `systemctl --failed --no-legend`
+    systemd_output = run_system_command('systemctl --failed --no-legend')
     service_array = []
     systemd_output.split("\n").each do |line|
       line_array = line.split(' ')
